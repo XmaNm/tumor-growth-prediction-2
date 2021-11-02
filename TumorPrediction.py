@@ -7,7 +7,8 @@ import tensorflow as tf
 import numpy as np
 from scipy.io import savemat
 from ops import *
-
+from cell import ConvLSTMCell
+from cell import ConvGRUCell
 
 class TumorPrediction(object):
     def __init__(self,
@@ -442,6 +443,13 @@ class TumorPrediction(object):
             tf.get_variable_scope().reuse_variables()
         num_layers = int(np.log2(self.size_image)) - int(self.size_kernel / 2)
         current = image
+        shape = [640, 480]
+        kernel = [3, 3]
+        filters = 12
+        cell = ConvLSTMCell(shape, filters, kernel)
+        # convlstm
+        outputs, state = tf.nn.dynamic_rnn(cell, current, dtype=current.dtype)
+
         # conv layers with stride 2
         for i in range(num_layers):
             name = 'E_conv' + str(i)
